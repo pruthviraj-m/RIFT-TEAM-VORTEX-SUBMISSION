@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection System</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css.css">
+    
+    <!-- Three.js and GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">Fraud Detection</div>
+        <div class="nav-links">
+            <a class="nav-link" onclick="scrollToSection('home')">Home</a>
+            <a class="nav-link" onclick="scrollToSection('graph')">Graph</a>
+            <a class="nav-link" onclick="scrollToSection('results')">Results</a>
+        </div>
+        <div class="menu-dots" onclick="toggleMenu()">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section">
+        <div class="section-container">
+            <div class="hero-content">
+                <h1 class="hero-title">FRAUD DETECTION<br></h1>
+                <p class="hero-subtitle">Advanced pattern recognition for money mule detection in transaction networks</p>
+                
+                <!-- Status Indicator -->
+                <div class="status-container">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span class="status-text" id="statusText">Checking system status...</span>
+                </div>
+
+                <!-- Upload Card -->
+                <div class="upload-card">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 16v-6m0 0l-3 3m3-3l3 3M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2h-7l-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    
+                    <input type="file" id="fileInput" class="file-input" accept=".csv">
+                    <label for="fileInput" class="file-label">Choose CSV File</label>
+                    <div class="file-info" id="fileInfo">No file selected</div>
+                    
+                    <button class="analyze-btn" id="analyzeBtn" onclick="analyzeFile()">Analyze Transactions</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Graph Section -->
+    <section id="graph" class="section" style="display: none;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">Network Visualization</h2>
+                <p class="section-subtitle">3D interactive graph of transaction patterns</p>
+            </div>
+            
+           <div class="graph-container">
+    <div id="network-graph"></div>
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color red"></div>
+            <span>🔴 Single Ring Member</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color yellow"></div>
+            <span>🟡 Repeat Offender (2+ Rings)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color white"></div>
+            <span>⚪ Merchant Accounts</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color green"></div>
+            <span>🟢 Normal Accounts</span>
+        </div>
+    </div>
+</div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAccounts">0</div>
+                    <div class="stat-label">Total Accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="suspiciousCount">0</div>
+                    <div class="stat-label">Suspicious</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ringsCount">0</div>
+                    <div class="stat-label">Fraud Rings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="processTime">0</div>
+                    <div class="stat-label">Processing (s)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   <!-- Results Section -->
+<section id="results" class="section" style="display: none;">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">Analysis Results</h2>
+            <p class="section-subtitle">Detected patterns and suspicious accounts</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('rings', event)">Fraud Rings</div>
+            <div class="tab" onclick="switchTab('accounts', event)">Suspicious Accounts</div>
+            <div class="tab" onclick="switchTab('repeat', event)">🔄 Repeat Offenders</div>
+        </div>
+
+        <!-- Rings Table -->
+        <div class="table-container" id="ringsTab">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ring ID</th>
+                        <th>Pattern Type</th>
+                        <th>Members</th>
+                        <th>Risk Score</th>
+                        <th>Accounts</th>
+                    </tr>
+                </thead>
+                <tbody id="ringsTableBody">
+                    <tr><td colspan="5" class="no-data">No data available</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Accounts Table -->
+        <div class="table-container hidden" id="accountsTab">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account ID</th>
+                        <th>Suspicion Score</th>
+                        <th>Patterns</th>
+                        <th>Ring ID</th>
+                    </tr>
+                </thead>
+                <tbody id="accountsTableBody">
+                    <tr><td colspan="4" class="no-data">No data available</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- NEW: Repeat Offenders Table -->
+        <div class="table-container hidden" id="repeatTab">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account ID</th>
+                        <th>Rings Count</th>
+                        <th>Ring IDs</th>
+                        <th>Pattern Types</th>
+                        <th>Avg Risk Score</th>
+                    </tr>
+                </thead>
+                <tbody id="repeatTableBody">
+                    <tr><td colspan="5" class="no-data">No repeat offenders detected</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Download Button -->
+        <button class="download-btn" id="downloadBtn" onclick="downloadJSON()" style="display: none;">
+            Download JSON Report
+        </button>
+    </div>
+</section>
+    <!-- Message Toast -->
+    <div class="message" id="message"></div>
+
+    <!-- Main JavaScript -->
+    <script src="js.js"></script>
+</body>
+</html>
